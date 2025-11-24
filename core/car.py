@@ -1,28 +1,28 @@
 from __future__ import annotations
 
 from typing import Literal
+from uuid import uuid4
 import numpy as np
 
-from core.stats import Gaussian
+from core.stats import LaneStats
 
 class Car:
-    def __init__(self, id: int, lane: int, position: float, ahead: Car, behind: Car, speed_lim: int, acc: float, num_lanes: int, global_stats: Gaussian):
-        self.id = id
+    def __init__(self, lane: int, position: float, ahead: Car, behind: Car, speed_lim: int, lane_stats: LaneStats):
+        self.id = uuid4()
         self.lane = lane
         self.position = position
         self.ahead = ahead
         self.behind = behind
         self.speed_lim = speed_lim
-        self.num_lanes = num_lanes
-        self.global_stats = global_stats
+        self.lane_stats = lane_stats
         self.status: Literal["steady", "passing", "exiting"]
         self.mode: Literal["speed", "distance"] | None = None
         self.speed: float | None = None
 
-        self.acc = acc
+        self.acc = 10
 
         # get random speed preferences SIMPLIFIED VERSION FOR NOW
-        self.speed_pref = [self.global_stats.sample() + i*5.0 for i in range(self.num_lanes)]
+        self.speed_pref = self.lane_stats.get_speed_prefs()
         self.speed_tol = np.random.uniform(low=0.0, high=10.0) # use uniform for now
 
         self.switch_dist = 50 # SIMPLIFIED VERSION FOR NOW
@@ -49,5 +49,5 @@ class Car:
             self.init_v = self.speed
         else:
             self.mode = "distance"
-            self.init_l = self.get_following_dist()
+            self.init_l = fol_dist
             self.init_v_rel = self.get_relative_speed()
