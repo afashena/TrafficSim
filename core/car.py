@@ -51,3 +51,16 @@ class Car:
             self.mode = "distance"
             self.init_l = fol_dist
             self.init_v_rel = self.get_relative_speed()
+
+    def update_status(self) -> None:
+
+        if self.status == "exiting":
+            return
+
+        if self.ahead.speed < self.speed_pref[self.lane] - self.speed_tol:
+            self.status = "passing"
+        else:
+            self.status = "steady"
+        
+
+
